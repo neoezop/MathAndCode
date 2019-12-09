@@ -22,7 +22,7 @@ class Converter(QObject):
         lines = inputText.splitlines()
         filtered_lines = []
         for line in lines:
-            if not (re.match(r'^([\s\t\n]+)$', line) or line == ''):
+            if not (re.match(r'^([\s\t]+)$', line) or line == ''):
                 filtered_lines.append(line)
 
         if (isPythonToMath):
@@ -31,7 +31,7 @@ class Converter(QObject):
             convertedText = py_to_math_converter.convert_py_to_math(py_to_math_converter, funcs)
         else:
             mathToPy = math_to_py()
-            funcs = mathToPy.break_to_funcs(inputText.splitlines())
+            funcs = mathToPy.break_to_funcs(filtered_lines)
             convertedText = math_to_py_converter.convert_math_to_py(math_to_py_converter, funcs)
         print(convertedText)
         self.convertResult.emit(convertedText)
