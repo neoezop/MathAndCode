@@ -1,3 +1,5 @@
+import re
+
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtQml import QQmlApplicationEngine
@@ -16,10 +18,16 @@ class Converter(QObject):
 
     # слот для перевода из одной формы в другую
     @pyqtSlot(str, bool)
-    def convert(self, inputText, isPythonToMath):
+    def convert(self, inputText: str, isPythonToMath):
+        lines = inputText.splitlines()
+        filtered_lines = []
+        for line in lines:
+            if not (re.match(r'^([\s\t\n]+)$', line) or line == ''):
+                filtered_lines.append(line)
+
         if (isPythonToMath):
             pyToMath = py_to_math()
-            funcs = pyToMath.break_to_funcs(inputText.splitlines())
+            funcs = pyToMath.break_to_funcs(filtered_lines)
             convertedText = py_to_math_converter.convert_py_to_math(py_to_math_converter, funcs)
         else:
             mathToPy = math_to_py()
