@@ -133,8 +133,8 @@ class math_to_py_converter:
         for f in funcs:
             code += "def " + f.name + "(n):"
             for cond in f.conditions:
-                code += "\n\tif " + cond.cond + ":"
-                code += "\n\t\treturn " + cond.action
+                code += "\n    if " + cond.cond + ":"
+                code += "\n        return " + cond.action
         return code
 
 
@@ -230,9 +230,10 @@ class py_to_math_converter:
                 if cond.cond == "conditionless":
                     text += ("{0}(n) = {1} при любом n;".format(f.name, cond.action))
                 elif cond.cond == "else":
-                    text += ("иначе, {0}(n) = {1};".format(f.name, cond.action))
+                    text += ("{0}(n) = {1} при всех остальных n;".format(f.name, cond.action))
                 else:
                     text += ("{0}(n) = {1} при {2};".format(f.name, cond.action, cond_text))
+                text += "\n"
             text += "\n"
         return text
 
