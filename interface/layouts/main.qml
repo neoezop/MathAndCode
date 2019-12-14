@@ -44,7 +44,7 @@ ApplicationWindow {
         ListView {
             id: listView
             anchors.fill: parent
-            interactive: false
+            interactive: true
             headerPositioning: ListView.OverlayHeader
             header: Pane {
                 id: header
@@ -152,10 +152,10 @@ ApplicationWindow {
                     text: isPythonToMath ? qsTr("Python код") : qsTr(
                                                "Математическое представление")
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    font.pointSize: 14
+                    font.pointSize: 12
                     font.bold: true
                 }
-                ComboBox {
+               /* ComboBox {
                     displayText: currentIndex == -1 ? "Выберите тип задания" : currentText
                     currentIndex: -1
                     Layout.fillHeight: false
@@ -163,7 +163,7 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                     Material.elevation: 0
                     model: ["Первый тип задания", "Второй тип задания", "Третий тип задания"]
-                }
+                }*/
                 Rectangle {
                     id: rectInput
                     Layout.rightMargin: 0
@@ -178,10 +178,11 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                     ScrollView {
                         id: view
-                        padding: 5
                         anchors.fill: parent
-                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-                        ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+                        padding: 10
+                        //todo scrollbar style
+                        //ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        //ScrollBar.vertical.policy: ScrollBar.AlwaysOff
 
                         TextArea {
                             id: textAreaInput
@@ -189,20 +190,9 @@ ApplicationWindow {
                             placeholderText: isPythonToMath ? qsTr("Введите Python код") : qsTr(
                                                                   "Введите математическое представление")
                             background: null
-                        }
-
-                        //is needed to turn Flickable on
-                        HoverHandler {
-                            onHoveredChanged: {
-
-
-                                /*if (hovered == true)
-                                    rectInput.border.color = Material.primary
-                                else
-                                    rectInput.border.color = Material.color(
-                                                Material.Grey,
-                                                Material.Shade200)*/
-                            }
+                            selectByKeyboard : true
+                            selectByMouse : true
+                            font.pointSize: 9
                         }
                     }
                 }
@@ -275,7 +265,7 @@ ApplicationWindow {
                     text: isPythonToMath ? qsTr("Математическое представление") : qsTr(
                                                "Python код")
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    font.pointSize: 14
+                    font.pointSize: 12
                     font.bold: true
                 }
                 Rectangle {
@@ -289,32 +279,46 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                     ScrollView {
-                        padding: 5
+                        padding: 10
                         anchors.fill: parent
-                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-                        ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+                        //ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                        //ScrollBar.vertical.policy: ScrollBar.AsNeeded
+
+                        //todo scrollview style
+                        /*style: ScrollViewStyle {
+                               handle: Rectangle {
+                                   implicitWidth: 50
+                                   implicitHeight: 30
+                                   color: "red"
+                               }
+                               scrollBarBackground: Rectangle {
+                                   implicitWidth: 50
+                                   implicitHeight: 30
+                                   color: "black"
+                               }
+                               decrementControl: Rectangle {
+                                   implicitWidth: 50
+                                   implicitHeight: 30
+                                   color: "green"
+                               }
+                               incrementControl: Rectangle {
+                                   implicitWidth: 50
+                                   implicitHeight: 30
+                                   color: "blue"
+                               }
+                           }*/
+
 
                         TextArea {
 
                             id: textAreaOutput
-                            text: ""
-                            enabled: false
+                            text: ""                            
                             placeholderText: ""
                             background: null
-                        }
-
-                        //is needed to turn Flickable on
-                        HoverHandler {
-                            onHoveredChanged: {
-
-
-                                /*if (hovered == true)
-                                    rectInput.border.color = Material.primary
-                                else
-                                    rectInput.border.color = Material.color(
-                                                Material.Grey,
-                                                Material.Shade200)*/
-                            }
+                            readOnly : true
+                            selectByKeyboard : true
+                            selectByMouse : true
+                            font.pointSize: 9
                         }
                     }
                 }
