@@ -27,9 +27,10 @@ class math_to_py:
         self.machine = Machine(model=self, states=math_to_py._states, initial="empty")
         self.cur_symbol: str = ""
         self.cur_string: str = ""
+        self.cur_func: func = None
         self._create_casual_transitions()
+        self.funcs_dict: dict = {}
         self.funcs: list[func] = []
-        self.conditions: list[condition] = []
 
     def _start_again(self):
         self.cur_symbol = ""
@@ -39,10 +40,10 @@ class math_to_py:
     def on_enter_f_num(self):
         cond = condition()
         cond.cond = "n == " + self.cur_symbol
-        self.conditions.append(cond)
+        self.cur_func.conditions.append(cond)
 
     def on_enter_f_num_end(self):
-        self.conditions[-1].action = self.cur_string[:-1].strip()
+        self.cur_func.conditions[-1].action = self.cur_string[:-1].strip()
         self._start_again()
 
     def on_enter_cond_first(self):
@@ -55,7 +56,7 @@ class math_to_py:
         action = action.replace("/", "//")
         action = action.replace(":", "//")
         cond.action = action
-        self.conditions.append(cond)
+        self.cur_func.conditions.append(cond)
         self.cur_string = ""
 
     def on_enter_f_n_end(self):
@@ -63,8 +64,15 @@ class math_to_py:
         cond = cond.replace("=", "==")
         cond = cond.replace("≤", "<=")
         cond = cond.replace("≥", ">=")
-        self.conditions[-1].cond = cond
+        self.cur_func.conditions[-1].cond = cond
         self._start_again()
+
+    def on_enter_f(self):
+        if not self.cur_symbol in self.funcs_dict:
+            self.funcs_dict[self.cur_symbol] = func()
+            self.funcs_dict[self.cur_symbol].name = self.cur_symbol
+        self.cur_func = self.funcs_dict[self.cur_symbol]
+
 
     def is_f(self):
         return self.cur_symbol == "f" or self.cur_symbol == "g"
@@ -121,10 +129,8 @@ class math_to_py:
                         self.machine.is_state("f_n_reading", self) or self.machine.is_state("cond_third", self)):
                     self.cur_string += self.cur_symbol
                 self.move()
-        f = func()
-        f.conditions = self.conditions
-        f.name = "f"
-        return [f]
+        self.funcs = list(self.funcs_dict.values())
+        return self.funcs
 
 
 class math_to_py_converter:
@@ -135,6 +141,7 @@ class math_to_py_converter:
             for cond in f.conditions:
                 code += "\n    if " + cond.cond + ":"
                 code += "\n        return " + cond.action
+            code += "\n"
         return code
 
 
@@ -257,7 +264,7 @@ def get_str_result_for(func_call: str, code: str):
 ##ПРИМЕРЫ
 '''
 wm = math_to_py()
-funcs = wm.break_to_funcs(["F(1) = 3", "F(2) = 3", "F(n) = 5*F(n-1) − 4*F(n−2) при n >2"])
+funcs = wm.break_to_funcs(["F(1) = 3; F(2) = 3; F(n) = 5*F(n-1) − 4*F(n−2) при n >2", "G(1) = 3; G(2) = 3; G(n) = 5*G(n-1) − 4*G(n−2) при n >2"])
 math_to_py_code = math_to_py_converter.convert_math_to_py(math_to_py_converter, funcs)
 print(math_to_py_code)
 print(get_int_result_for("f(15)", math_to_py_code))
