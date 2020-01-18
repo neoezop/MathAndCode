@@ -268,12 +268,12 @@ def get_str_result_for(func_call: str, code: str):
 
 
 ##ПРИМЕРЫ
-
+'''
 wm = math_to_py()
-funcs = wm.break_to_funcs(["alpha(7) = asdsad", "gamma(9) = 1000", "beta(n) = beta(n-1) + 1 при n > 1; beta(1) = 10"])
+funcs = wm.break_to_funcs(["alpha(7) = 'asdsad'", "gamma(9) = 1000", "beta(n) = beta(n-1) + 1 при n > 1; beta(1) = 10"])
 math_to_py_code = math_to_py_converter.convert_math_to_py(math_to_py_converter, funcs)
 print(math_to_py_code)
-print(get_int_result_for("alpha(15)", math_to_py_code))
+print(get_int_result_for("beta(7)", math_to_py_code))
 cm = py_to_math()
 cm.break_to_funcs([
     "def F(n):",
@@ -289,4 +289,5 @@ cm.break_to_funcs([
 ])
 print(get_int_result_for("f(6)", cm.code))
 print(py_to_math_converter.convert_py_to_math(py_to_math_converter, cm.funcs))
+'''
 
