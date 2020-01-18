@@ -9,9 +9,15 @@ ListModel {
     }*/
     ListElement {
         ic: "images/solve_for_n.png"
-        name: "Решить для N"
+        name: "Решенить для N"
         selected: "0"
         click: "solve"
+    }
+    ListElement {
+        ic: "images/call_tree.png"
+        name: "Дерево вызовов"
+        selected: "0"
+        click: "tree"
     }
     ListElement {
         ic: "images/export.png"

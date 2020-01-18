@@ -6,6 +6,8 @@ import QtQuick.Layouts 1.13
 
 ApplicationWindow {
     id: window
+    minimumHeight: 400
+    minimumWidth: 1150
     width: 1200
     height: 500
     visible: true
@@ -13,6 +15,19 @@ ApplicationWindow {
     color: Material.color(Material.Grey, Material.Shade100)
 
     property bool isPythonToMath: true
+    property string errorText: "none"
+    property int appWidth: 1200
+    property int appHeight: 500
+
+    onWidthChanged: {
+        textAreaOutput.text=appWidth+"x"+appHeight;
+        appWidth = window.width;
+    }
+
+    onHeightChanged: {
+        textAreaOutput.text=appWidth+"x"+appHeight;
+        appHeight = window.height;
+    }
 
 
     /*ToolBar {
@@ -87,6 +102,7 @@ ApplicationWindow {
                         exportPopup.open()
                         break
                     }
+                    //todo new menu items
                 }
             }
 
@@ -155,7 +171,8 @@ ApplicationWindow {
                     font.pointSize: 12
                     font.bold: true
                 }
-               /* ComboBox {
+
+                /* ComboBox {
                     displayText: currentIndex == -1 ? "Выберите тип задания" : currentText
                     currentIndex: -1
                     Layout.fillHeight: false
@@ -180,18 +197,18 @@ ApplicationWindow {
                         id: view
                         anchors.fill: parent
                         padding: 10
+
                         //todo scrollbar style
                         //ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                         //ScrollBar.vertical.policy: ScrollBar.AlwaysOff
-
                         TextArea {
                             id: textAreaInput
                             text: ""
                             placeholderText: isPythonToMath ? qsTr("Введите Python код") : qsTr(
                                                                   "Введите математическое представление")
                             background: null
-                            selectByKeyboard : true
-                            selectByMouse : true
+                            selectByKeyboard: true
+                            selectByMouse: true
                             font.pointSize: 9
                         }
                     }
@@ -231,7 +248,9 @@ ApplicationWindow {
                 onClicked: {
                     if (textAreaInput.text == "") {
                         //PopupEmptyInput
-                        popupEmptyInput.open()
+                        errorText = "mainInputEmptyError"
+                        popupError.open()
+                        //popupErrorText.text="Ввод не может быть пустым.\nПримеры ввода находятся в разделе помощь.";
                     } else {
                         converter.convert(textAreaInput.text, isPythonToMath)
                     }
@@ -271,7 +290,8 @@ ApplicationWindow {
                 Rectangle {
                     id: rectOutput
                     Layout.rightMargin: 0
-                    border.color: Material.color(Material.Grey,Material.Shade200)
+                    border.color: Material.color(Material.Grey,
+                                                 Material.Shade200)
                     border.width: 1
                     Layout.minimumWidth: 250
                     Layout.minimumHeight: 300
@@ -281,10 +301,12 @@ ApplicationWindow {
                     ScrollView {
                         padding: 10
                         anchors.fill: parent
+
                         //ScrollBar.horizontal.policy: ScrollBar.AsNeeded
                         //ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
                         //todo scrollview style
+
                         /*style: ScrollViewStyle {
                                handle: Rectangle {
                                    implicitWidth: 50
@@ -307,17 +329,15 @@ ApplicationWindow {
                                    color: "blue"
                                }
                            }*/
-
-
                         TextArea {
 
                             id: textAreaOutput
-                            text: ""                            
+                            text: ""
                             placeholderText: ""
                             background: null
-                            readOnly : true
-                            selectByKeyboard : true
-                            selectByMouse : true
+                            readOnly: true
+                            selectByKeyboard: true
+                            selectByMouse: true
                             font.pointSize: 9
                         }
                     }
@@ -326,21 +346,54 @@ ApplicationWindow {
         }
     }
 
-    // Converter results there
     Connections {
         target: converter
 
-        // Обработчик сигнала сложения
+        // convertion result there
         onConvertResult: {
-            // sum было задано через arguments=['sum']
-            textAreaOutput.text = convert;
+            if (convert == "PyToMathError") //error converting python to math, wrong input
+            {
+                textAreaOutput.text = ""
+                errorText = "PyToMathError"
+                popupError.open()
+                //popupErrorText.text="Неверный формат Python кода.\nПримеры указаны в разделе помощь.";
+                //popupPyToMathError.open()
+            } else if (convert == "MathToPyError") //error converting math to python, wrong input
+            {
+                textAreaOutput.text = ""
+                errorText = "MathToPyError"
+                popupError.open()
+                //popupErrorText.text="Неверный формат Мат. представления.\nПримеры указаны в разделе помощь.";
+                //popupMathToPyError.open()
+            } else
+                //success
+                textAreaOutput.text = convert
         }
     }
 
-    PopupEmptyInput {
+    // Count for n results there
+
+    /*Connections {
+        target: countforn
+
+
+    }*/
+    PopupError {
+        id: popupError
+    }
+
+
+    /*PopupEmptyInput {
         id: popupEmptyInput
     }
 
+    PopupPyToMathError {
+        id: popupPyToMathError
+    }
+
+    PopupMathToPyError {
+        id: popupMathToPyError
+    }*/
     PopupSolve {
         id: solvePopup
     }
