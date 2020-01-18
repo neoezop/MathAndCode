@@ -1,4 +1,5 @@
 from transitions import Machine
+import re
 
 
 class condition:
@@ -55,6 +56,7 @@ class math_to_py:
         action = action.replace("–", "-")
         action = action.replace("/", "//")
         action = action.replace(":", "//")
+        action = action.replace("+", "+")
         cond.action = action
         self.cur_func.conditions.append(cond)
         self.cur_string = ""
@@ -69,6 +71,9 @@ class math_to_py:
 
     def on_enter_f_open(self):
         self.cur_string = self.cur_string[:-1]
+        charRe = re.compile(r'[^a-z_]')
+        if bool(charRe.search(self.cur_string)):
+            raise Exception()
         if not self.cur_string in self.funcs_dict:
             self.funcs_dict[self.cur_string] = func()
             self.funcs_dict[self.cur_string].name = self.cur_string
@@ -138,13 +143,28 @@ class math_to_py:
 
 
 class math_to_py_converter:
-    def convert_math_to_py(self, funcs: list) -> str:
+    def convert(self, funcs: list) -> str:
         code: str = ""
         for f in funcs:
             code += "def " + f.name + "(n):"
             for cond in f.conditions:
-                code += "\n    if " + cond.cond + ":"
-                code += "\n        return " + cond.action
+                #ЗАГЛУШКИ
+                if cond.cond.find("любом") != -1:
+                    if cond.action.find("print") != -1:
+                        code += "\n    " + cond.action
+                    else:
+                        code += "\n    return " + cond.action
+                    continue
+
+                if cond.cond.find("всех остальных") != -1:
+                    code += "\n    else:"
+                else:
+                    code += "\n    if " + cond.cond + ":"
+
+                if cond.action.find("print") != -1:
+                    code += "\n        " + cond.action
+                else:
+                    code += "\n        return " + cond.action
             code += "\n"
         return code
 
@@ -232,7 +252,7 @@ class py_to_math:
 
 
 class py_to_math_converter:
-    def convert_py_to_math(self, funcs: list) -> str:
+    def convert(self, funcs: list) -> str:
         text: str = ""
         for f in funcs:
             for cond in f.conditions:
@@ -270,10 +290,12 @@ def get_str_result_for(func_call: str, code: str):
 ##ПРИМЕРЫ
 '''
 wm = math_to_py()
-funcs = wm.break_to_funcs(["alpha(7) = 'asdsad'", "gamma(9) = 1000", "beta(n) = beta(n-1) + 1 при n > 1; beta(1) = 10"])
-math_to_py_code = math_to_py_converter.convert_math_to_py(math_to_py_converter, funcs)
+funcs = wm.break_to_funcs(["f(n) = f(n-1) при n > 3; f(n) = 1 при всех остальных n;",
+                           "omg(n) = print('asdsdas') при любом n",
+                           "test(n) = print('*') при n > 2; test(n) = 1 при всех остальных n;"])
+math_to_py_code = math_to_py_converter.convert(math_to_py_converter, funcs)
 print(math_to_py_code)
-print(get_int_result_for("beta(7)", math_to_py_code))
+print(get_int_result_for("f(40)", math_to_py_code))
 cm = py_to_math()
 cm.break_to_funcs([
     "def F(n):",
@@ -288,6 +310,5 @@ cm.break_to_funcs([
     "       return n", "", ""
 ])
 print(get_int_result_for("f(6)", cm.code))
-print(py_to_math_converter.convert_py_to_math(py_to_math_converter, cm.funcs))
+print(py_to_math_converter.convert(py_to_math_converter, cm.funcs))
 '''
-
